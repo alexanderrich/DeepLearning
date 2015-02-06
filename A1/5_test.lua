@@ -8,6 +8,7 @@
 require 'torch'   -- torch
 require 'xlua'    -- xlua provides useful tools, like progress bars
 require 'optim'   -- an optimization package, for online and batch methods
+require 'csvigo'  -- for saving predictions
 
 ----------------------------------------------------------------------
 print '==> defining test procedure'
@@ -16,7 +17,7 @@ print '==> defining test procedure'
 function test()
    -- local vars
    local time = sys.clock()
-
+   predictions = {Prediction={},Id={}}
    -- averaged param use?
    if average then
       cachedparams = parameters:clone()
@@ -42,6 +43,10 @@ function test()
       local pred = model:forward(input)
       -- print("\n" .. target .. "\n")
       confusion:add(pred, target)
+      predictions.Id[t] = t
+      trash_var, predictions.Prediction[t] = torch.max(pred, 1)
+      predictions.Prediction[t] = predictions.Prediction[t][1]
+      
    end
 
    -- timing
@@ -64,7 +69,7 @@ function test()
       -- restore parameters
       parameters:copy(cachedparams)
    end
-   
+   csvigo.save({data=predictions, path = "results/pred.csv"})
    -- next iteration:
    confusion:zero()
 end
