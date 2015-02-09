@@ -1,8 +1,6 @@
 ## Architecture
 > (number and type of layers, number of neurons, size of input)
 
-Our convolutional network has XX layers.
-
 #### Input
 The input is a 3D array with three 2D feature maps of size 32 x 32.
 
@@ -34,14 +32,14 @@ The output is a vector of size 10, where each value indicates the likelihood of 
 ## Learning Techniques
 > (which data augmentations?, used dropout?, etc.)
 
-We did not use dropout.
+We did not use dropout and used the extra training data with 604388 examples.
 
 
 ## Training Procedure
 > (learning rate, momentum, error metrics used, train/validation split, training/validation/test error)
 
 We used a Learning rate of .001.
-We used no mini-batches, no weight decay, and no momentum.
+We used no mini-batches, and set the momentum and weight decay to 0.
 We used negative log-likelihood as loss function.
 We decided to work without a validation sample and thus used all train data for training.
 
