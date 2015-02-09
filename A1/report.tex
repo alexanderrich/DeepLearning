@@ -5,7 +5,9 @@
 
 \paragraph{Input}\label{input}
 
-The input is a 3D array with three 2D feature maps of size 32 x 32.
+The input is a 3D array with three 2D feature maps of size 32 x 32. We preprocessed the training data 
+by normalizing across features so that each feature had a mean of 0 and a standard deviation of 1 and then
+used the same normalization for the test data. The data were also then locally normalized.
 
 \paragraph{Stage 1}\label{stage-1}
 
