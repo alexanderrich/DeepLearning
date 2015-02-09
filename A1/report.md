@@ -40,7 +40,11 @@ We did not use dropout.
 ## Training Procedure
 > (learning rate, momentum, error metrics used, train/validation split, training/validation/test error)
 
-#### Error metric
-Learning rate: .001
-Momentum: 0
+We used a Learning rate of .001.
+We used no mini-batches, no weight decay, and no momentum.
 We used negative log-likelihood as loss function.
+We decided to work without a validation sample and thus used all train data for training.
+
+The training error was
+
+The test error was
