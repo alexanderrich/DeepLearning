@@ -22,12 +22,12 @@ The receptive field of this first layer is 5x5, and the maps produced by it are 
 > filter bank -> squashing -> L2 pooling -> normalization
 
 Stage 2 is a repetition of Stage 1.
-The result is a 64x10x10 array.
+The result is a 64x5x5 array.
 
 #### Stage 3
 > standard 2-layer neural network
 
-In Stage 3 a 2-layer perceptron does ...
+In Stage 3 we first flatten all the features to get 3200 features. This gets fed into a two layer linear neural net with a hidden layer of size 128.
 The output is a vector of size 10, where each value indicates the likelihood of the labels '0' to '9'.
 
 
