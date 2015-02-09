@@ -14,14 +14,15 @@ The receptive field of this first layer is 5x5, and the maps produced by it are 
 
 2. This linear transform is then followed by a non-linearity (tanh)
 
-3. and an L2-pooling function, which pools regions of size 2x2, and uses a stride of 2x2.
-The result of that operation is a 64x14x14 array, which represents a 14x14 map of 64-dimensional feature vectors. The receptive field of each unit at this stage is 7x7.
+3. and an L2-pooling function, which pools regions of size 2x2, and uses a stride of 2x2 so the receptive field is now 7x7 The result of that operation is a 64x14x14 array, which represents a 14x14 map of 64-dimensional feature vectors.
+
+4. Finally, there is a subtractive normalization step with kernal constructed from a 1D Gaussian of length 7.
 
 #### Stage 2
 > filter bank -> squashing -> L2 pooling -> normalization
 
 Stage 2 is a repetition of Stage 1.
-The result is again a 64x14x14 array.
+The result is a 64x10x10 array.
 
 #### Stage 3
 > standard 2-layer neural network
@@ -40,4 +41,6 @@ We did not use dropout.
 > (learning rate, momentum, error metrics used, train/validation split, training/validation/test error)
 
 #### Error metric
+Learning rate: .001
+Momentum: 0
 We used negative log-likelihood as loss function.
