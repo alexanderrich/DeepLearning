@@ -1,7 +1,35 @@
 -- loading data
-mat = matio.load('stl10_matlab/train.mat')
-mat.X = mat.X:double()
-mat.X = nn.Reshape(3,96,96):forward(mat.X)
+if opt.dataSource == 'mat' then
+   mat = matio.load('stl10_matlab/train.mat')
+   mat.X = mat.X:double()
+   mat.X = nn.Reshape(3,96,96):forward(mat.X)
+   mat.y = mat.y[{{},1}]
+
+else
+   mat = {}
+   block = 1
+   mat.X = torch.Tensor(5000*3*96*96)
+   mat.y = torch.Tensor(5000)
+   file = io.open('stl10_binary/train_X.bin')
+   i = 0
+   while true do
+      i = i+1
+      byte = file:read(block)
+      if not byte then break end
+      mat.X[{i}] = tonumber(string.byte(byte))
+   end
+   mat.X = mat.X:double()
+   mat.X = nn.Reshape(5000,3,96,96):forward(mat.X)
+
+   file = io.open('stl10_binary/train_y.bin')
+   i = 0
+   while true do
+      i = i+1
+      byte = file:read(block)
+      if not byte then break end
+      mat.y[{i}] = tonumber(string.byte(byte))
+   end
+end
 mat.X = mat.X:transpose(3,4)
 
 -- if opt.size == 'full' then
@@ -23,13 +51,13 @@ traindataX = torch.Tensor(trsize, 3,96,96)
 traindataY = torch.Tensor(trsize)
 for i=1,trsize do
    traindataX[{i,{},{},{}}] = mat.X[{idx[i],{},{},{}}]
-   traindataY[i] = mat.y[{idx[i],1}]
+   traindataY[i] = mat.y[idx[i]]
 end
 valdataX = torch.Tensor(valsize, 3,96,96)
 valdataY = torch.Tensor(valsize)
 for i=1,valsize do
    valdataX[{i,{},{},{}}] = mat.X[{idx[trsize+i],{},{},{}}]
-   valdataY[i] = mat.y[{idx[trsize+i],1}]
+   valdataY[i] = mat.y[idx[trsize+i]]
 end
 
 trainData = {
@@ -45,14 +73,42 @@ valData = {
 }
 
 -- loading test data
-mat = matio.load('stl10_matlab/test.mat')
-mat.X = mat.X:double()
-mat.X = nn.Reshape(3,96,96):forward(mat.X)
+if opt.dataSource == 'mat' then
+   mat = matio.load('stl10_matlab/test.mat')
+   mat.X = mat.X:double()
+   mat.X = nn.Reshape(3,96,96):forward(mat.X)
+   mat.y = mat.y[{{},1}]
+else
+   mat = {}
+   block = 1
+   mat.X = torch.Tensor(8000*3*96*96)
+   mat.y = torch.Tensor(8000)
+   file = io.open('stl10_binary/test_X.bin')
+   i = 0
+   while true do
+      i = i+1
+      byte = file:read(block)
+      if not byte then break end
+      mat.X[{i}] = tonumber(string.byte(byte))
+   end
+   mat.X = mat.X:double()
+   mat.X = nn.Reshape(8000,3,96,96):forward(mat.X)
+
+   file = io.open('stl10_binary/test_y.bin')
+   i = 0
+   while true do
+      i = i+1
+      byte = file:read(block)
+      if not byte then break end
+      mat.y[{i}] = tonumber(string.byte(byte))
+   end
+end
+
 mat.X = mat.X:transpose(3,4)
 
 testData = {
    data = mat.X,
-   labels = mat.y[{{},1}], -- tensor becomes number (for ClassNLL)
+   labels = mat.y, -- tensor becomes number (for ClassNLL)
    size = function() return testsize end
 }
 
