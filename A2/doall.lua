@@ -41,13 +41,14 @@ print '==> executing all'
 dofile '1_data.lua'
 dofile '2_model.lua'
 dofile '3_train.lua'
---dofile '4_test.lua'
+dofile '4_test.lua'
 
 
 print '==> training!'
 i = 0
 while i<5 do
    train()
-   --test()
+   test(true)
    i = i+1
 end
+test(false)
