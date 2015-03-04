@@ -125,6 +125,10 @@ end
 for i = 1,valData:size() do
    image.rgb2yuv(valData.data[i], valData.data[i]);
 end
+for i = 1,testData:size() do
+   image.rgb2yuv(testData.data[i], testData.data[i]);
+end
+
 
 
 -- per channel mean substraction
