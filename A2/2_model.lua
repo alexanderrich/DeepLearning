@@ -17,7 +17,7 @@ if opt.model == 'simple' then
          -- model:add(nn.Reshape(27648))
          -- model:add(nn.Reshape(3,96,96,false)) -- delete 'false' when working with batches
          -- model:add(nn.SpatialZeroPadding(2,2,2,2))
-         model:add(nn.SpatialConvolutionMM(3,23,7,7,2,2)) -- 23 channels, 7x7 filters, stride (step) 2
+         model:add(nn.SpatialConvolution(3,23,7,7,2,2)) -- 23 channels, 7x7 filters, stride (step) 2
          model:add(nn.ReLU())
          model:add(nn.SpatialMaxPooling(3,3,2,2)) -- stride 2
          model:add(nn.Dropout())
