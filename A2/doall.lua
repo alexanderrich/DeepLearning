@@ -1,7 +1,7 @@
 require 'torch'
 require 'image'
 require 'nn'
-matio = require 'matio'
+
 
 cmd = torch.CmdLine()
 cmd:text()
@@ -9,6 +9,7 @@ cmd:text('STL-10')
 cmd:text()
 cmd:text('Options:')
 cmd:option('-dataSource', 'mat', 'matlab or binary data: mat | bin')
+cmd:option('-dataDir', '.', 'directory holding data folders')
 cmd:option('-type', 'double', 'type: double | float | cuda')
 cmd:option('-seed', 1, 'fixed input seed for repeatable experiments')
 cmd:option('-threads', 2, 'number of threads')

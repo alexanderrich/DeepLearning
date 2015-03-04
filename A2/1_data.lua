@@ -1,6 +1,10 @@
 -- loading data
 if opt.dataSource == 'mat' then
-   mat = matio.load('stl10_matlab/train.mat')
+   matio = require 'matio'
+end
+
+if opt.dataSource == 'mat' then
+   mat = matio.load(opt.dataDir ..'/matlab/train.mat')
    mat.X = mat.X:double()
    mat.X = nn.Reshape(3,96,96):forward(mat.X)
    mat.y = mat.y[{{},1}]
@@ -10,7 +14,7 @@ else
    block = 1
    mat.X = torch.Tensor(5000*3*96*96)
    mat.y = torch.Tensor(5000)
-   file = io.open('stl10_binary/train_X.bin')
+   file = io.open(opt.dataDir .. '/binary/train_X.bin')
    i = 0
    while true do
       i = i+1
@@ -18,10 +22,10 @@ else
       if not byte then break end
       mat.X[{i}] = tonumber(string.byte(byte))
    end
-   mat.X = mat.X:double()
+   mat.X = mat.X:float()
    mat.X = nn.Reshape(5000,3,96,96):forward(mat.X)
 
-   file = io.open('stl10_binary/train_y.bin')
+   file = io.open(opt.dataDir .. '/binary/train_y.bin')
    i = 0
    while true do
       i = i+1
@@ -74,7 +78,7 @@ valData = {
 
 -- loading test data
 if opt.dataSource == 'mat' then
-   mat = matio.load('stl10_matlab/test.mat')
+   mat = matio.load(opt.dataDir .. '/matlab/test.mat')
    mat.X = mat.X:double()
    mat.X = nn.Reshape(3,96,96):forward(mat.X)
    mat.y = mat.y[{{},1}]
@@ -83,7 +87,7 @@ else
    block = 1
    mat.X = torch.Tensor(8000*3*96*96)
    mat.y = torch.Tensor(8000)
-   file = io.open('stl10_binary/test_X.bin')
+   file = io.open( opt.dataDir .. '/binary/test_X.bin')
    i = 0
    while true do
       i = i+1
@@ -94,7 +98,7 @@ else
    mat.X = mat.X:double()
    mat.X = nn.Reshape(8000,3,96,96):forward(mat.X)
 
-   file = io.open('stl10_binary/test_y.bin')
+   file = io.open( opt.dataDir .. '/binary/test_y.bin')
    i = 0
    while true do
       i = i+1
@@ -145,3 +149,4 @@ for i = 1,3 do
     testData.data[{ {},i,{},{} }]:add(-mean[i])
     testData.data[{ {},i,{},{} }]:div(std[i])
 end
+
