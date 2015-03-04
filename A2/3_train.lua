@@ -50,7 +50,7 @@ elseif opt.optimization == 'SGD' then
       learningRate = opt.learningRate,
       weightDecay = opt.weightDecay,
       momentum = opt.momentum,
-      learningRateDecay = 1e-7
+      learningRateDecay = 0
    }
    optimMethod = optim.sgd
 
@@ -87,7 +87,7 @@ function train()
    print("==> online epoch # " .. epoch .. ' [batchSize = ' .. opt.batchSize .. ']')
    for t = 1,trainData:size(),opt.batchSize do
       -- disp progress
-      xlua.progress(t, trainData:size())
+      --xlua.progress(t, trainData:size())
 
       -- create mini batch
       local inputs = {}
@@ -170,4 +170,5 @@ function train()
    -- next epoch
    confusion:zero()
    epoch = epoch + 1
+   opt.learningRate = opt.learningRate * opt.learningRateDecay
 end
