@@ -32,7 +32,7 @@ if opt.model == 'simple' then
       end
 end
 
-criterion = nn.ClassNLLCriterion()
+criterion = nn.DistKLDivCriterion()
 
 print '==> here is the model:'
 print(model)
