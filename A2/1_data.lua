@@ -22,7 +22,7 @@ else
       if not byte then break end
       mat.X[{i}] = tonumber(string.byte(byte))
    end
-   mat.X = mat.X:float()
+   mat.X = mat.X:double()
    mat.X = nn.Reshape(5000,3,96,96):forward(mat.X)
 
    file = io.open(opt.dataDir .. '/binary/train_y.bin')
