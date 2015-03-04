@@ -23,7 +23,7 @@ if opt.model == 'simple' then
          model:add(nn.Dropout())
 
          -- fully connected layer (50 units)
-         model:add(nn.Reshape(23*22*22,false)) -- delete 'false' when working with batches
+         model:add(nn.Reshape(23*22*22)) -- delete 'false' when working with batches
          model:add(nn.Linear(23*22*22,50))
          model:add(nn.Tanh())
          model:add(nn.Linear(50,10))
