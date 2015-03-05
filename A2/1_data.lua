@@ -202,3 +202,49 @@ end
 
 print ('==> trainData:size() = ' .. trainData:size())
 
+
+-- per channel normalization ---------------------
+if opt.colorNormalize == 'channel' then  
+  print '==> per channel normalization'
+  mean = {}
+  std = {}
+  for i = 2,3 do -- only S and V channel
+      -- use mean and std from training data    
+      mean[i] = trainData.data[{ {},i,{},{} }]:mean()
+      std[i] = trainData.data[{ {},i,{},{} }]:std()
+      
+      trainData.data[{ {},i,{},{} }]:add(-mean[i])
+      trainData.data[{ {},i,{},{} }]:div(std[i])
+
+      valData.data[{ {},i,{},{} }]:add(-mean[i])
+      valData.data[{ {},i,{},{} }]:div(std[i])
+
+      testData.data[{ {},i,{},{} }]:add(-mean[i])
+      testData.data[{ {},i,{},{} }]:div(std[i])
+  end
+end
+
+-- per pixel normalization ---------------------
+if opt.colorNormalize == 'pixel' then  
+  print '==> per pixel normalization'
+  pixel_mean = torch.Tensor(3,96,96)
+  pixel_std = torch.Tensor(3,96,96)
+  for i = 2,3 do -- only S and V channel
+      for j = 1,96 do
+          for k = 1,96 do
+            -- use mean and std from training data
+            pixel_mean[{ i,j,k }] = trainData.data[{ {},i,j,k }]:mean()
+            pixel_std[{ i,j,k }] = trainData.data[{ {},i,j,k }]:std()
+
+            trainData.data[{ {},i,j,k }]:add(-pixel_mean[{ i,j,k }])
+            trainData.data[{ {},i,j,k }]:div(pixel_std[{ i,j,k }])
+
+            valData.data[{ {},i,j,k }]:add(-pixel_mean[{ i,j,k }])
+            valData.data[{ {},i,j,k }]:div(pixel_std[{ i,j,k }])
+
+            testData.data[{ {},i,j,k }]:add(-pixel_mean[{ i,j,k }])
+            testData.data[{ {},i,j,k }]:div(pixel_std[{ i,j,k }])
+          end
+      end
+  end
+end
