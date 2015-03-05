@@ -50,7 +50,8 @@ elseif opt.optimization == 'SGD' then
       learningRate = opt.learningRate,
       weightDecay = opt.weightDecay,
       momentum = opt.momentum,
-      learningRateDecay = 0
+      evalCounter = epoch or 0,
+      learningRateDecay = opt.learningRateDecay
    }
    optimMethod = optim.sgd
 
@@ -85,22 +86,24 @@ function train()
    -- do one epoch
    print('==> doing epoch on training data:')
    print("==> online epoch # " .. epoch .. ' [batchSize = ' .. opt.batchSize .. ']')
-   for t = 1,trainData:size(),opt.batchSize do
+   for t = 0,trainData:size() - opt.batchSize, opt.batchSize do
       -- disp progress
       --xlua.progress(t, trainData:size())
 
       -- create mini batch
-      local inputs = {}
-      local targets = {}
-      for i = t,math.min(t+opt.batchSize-1,trainData:size()) do
+      local inputs = torch.Tensor(128,3,96,96)
+      local targets = torch.Tensor(128)
+      for i = 1, opt.batchSize do
+      --for i = t,math.min(t+opt.batchSize-1,trainData:size()) do
          -- load new sample
-         local input = trainData.data[shuffle[i]]
-         local target = trainData.labels[shuffle[i]]
-         if opt.type == 'double' then input = input:double()
-         elseif opt.type == 'cuda' then input = input:cuda() end
-         table.insert(inputs, input)
-         table.insert(targets, target)
+         inputs[i] = trainData.data[shuffle[t+1]]
+         targets[i] = trainData.labels[shuffle[t+1]]
+         --local input = trainData.data[shuffle[i]]
+         --local target = trainData.labels[shuffle[i]]
       end
+      if opt.type == 'double' then inputs = inputs:double()
+      elseif opt.type == 'cuda' then inputs = inputs:cuda() end
+
 
       -- create closure to evaluate f(X) and df/dX
       local feval = function(x)
@@ -113,26 +116,28 @@ function train()
                        gradParameters:zero()
 
                        -- f is the average of all criterions
-                       local f = 0
 
                        -- evaluate function for complete mini batch
-                       for i = 1,#inputs do
-                          -- estimate f
-                          local output = model:forward(inputs[i])
-                          local err = criterion:forward(output, targets[i])
-                          f = f + err
+                       local output = model:forward(inputs)
+                       local f = criterion:forward(output, targets)
+                       local df_do = criterion:backward(output, targets)
+                       model:backward(inputs, df_do)
+                       -- for i = 1,#inputs do
+                       --    -- estimate f
+                       --    local output = model:forward(inputs[i])
+                       --    local err = criterion:forward(output, targets[i])
+                       --    f = f + err
 
-                          -- estimate df/dW
-                          local df_do = criterion:backward(output, targets[i])
-                          model:backward(inputs[i], df_do)
+                       --    -- estimate df/dW
+                       --    local df_do = criterion:backward(output, targets[i])
+                       --    model:backward(inputs[i], df_do)
 
-                          -- update confusion
-                          confusion:add(output, targets[i])
+                       --    -- update confusion
+                       for i = 1, opt.batchSize do
+                          confusion:add(output[i], targets[i])
                        end
+                       -- end
 
-                       -- normalize gradients and f(X)
-                       gradParameters:div(#inputs)
-                       f = f/#inputs
 
                        -- return f and df/dX
                        return f,gradParameters
@@ -170,5 +175,4 @@ function train()
    -- next epoch
    confusion:zero()
    epoch = epoch + 1
-   opt.learningRate = opt.learningRate * opt.learningRateDecay
 end

@@ -18,7 +18,7 @@ else
    model:add(nn.Dropout())
 
    -- fully connected layer (50 units)
-   model:add(nn.Reshape(22*22*23))
+   model:add(nn.View(22*22*23))
    model:add(nn.Linear(22*22*23,50))
    model:add(nn.Tanh())
    model:add(nn.Linear(50,10))
