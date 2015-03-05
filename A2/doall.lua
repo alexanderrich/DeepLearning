@@ -20,7 +20,7 @@ cmd:option('-optimization', 'SGD', 'optimization method: SGD | ASGD | CG | LBFGS
 cmd:option('-learningRate', 1e-3, 'learning rate at t=0')
 cmd:option('-learningRateDecay', 0.002, 'learning rate decay per epoch')
 -- add learning decay
-cmd:option('-batchSize', 1, 'mini-batch size (1 = pure stochastic)')
+cmd:option('-batchSize', 128, 'mini-batch size (1 = pure stochastic)')
 cmd:option('-weightDecay', 0, 'weight decay (SGD only)')
 cmd:option('-momentum', 0, 'momentum (SGD only)')
 cmd:option('-t0', 1, 'start averaging at t0 (ASGD only), in nb of epochs')
