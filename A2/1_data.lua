@@ -106,6 +106,12 @@ inflate_factor = opt.dataAugmentation
 
 if inflate_factor == 1 then
   print '==> no data augmentation'
+
+  -- Convert all images to HSV ---------------------
+  for i = 1,trainData:size() do
+      image.rgb2hsv(trainData.data[i], trainData.data[i]);
+  end
+
 else 
   print ('==> augment train data set by ' .. inflate_factor)
   
@@ -195,43 +201,4 @@ else
 end
 
 print ('==> trainData:size() = ' .. trainData:size())
-
-
--- OLD ----------
-
--- -- Convert all images to YUV
--- for i = 1,trainData:size() do
---    image.rgb2yuv(trainData.data[i], trainData.data[i]);
--- end
--- for i = 1,valData:size() do
---    image.rgb2yuv(valData.data[i], valData.data[i]);
--- end
--- for i = 1,testData:size() do
---    image.rgb2yuv(testData.data[i], testData.data[i]);
--- end
-
-
-
--- -- per channel mean substraction
--- mean = {} -- save for later
--- std = {}
--- for i = 1,3 do
---     mean[i] = trainData.data[{ {},i,{},{} }]:mean()
---     trainData.data[{ {},i,{},{} }]:add(-mean[i])
---     -- normalizing standard deviation as well, can't imagine this hurts...
---     std[i] = trainData.data[{ {},i,{},{} }]:std()
---     trainData.data[{ {},i,{},{} }]:div(std[i])
--- end
-
--- -- mean subtract and normalize for validation and test sets
--- for i = 1,3 do
---     valData.data[{ {},i,{},{} }]:add(-mean[i])
---     valData.data[{ {},i,{},{} }]:div(std[i])
--- end
-
-
--- for i = 1,3 do
---     testData.data[{ {},i,{},{} }]:add(-mean[i])
---     testData.data[{ {},i,{},{} }]:div(std[i])
--- end
 
