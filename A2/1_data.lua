@@ -11,28 +11,17 @@ if opt.dataSource == 'mat' then
 
 else
    mat = {}
-   block = 1
-   mat.X = torch.Tensor(5000*3*96*96)
-   mat.y = torch.Tensor(5000)
-   file = io.open(opt.dataDir .. '/binary/train_X.bin')
-   i = 0
-   while true do
-      i = i+1
-      byte = file:read(block)
-      if not byte then break end
-      mat.X[{i}] = tonumber(string.byte(byte))
-   end
-   mat.X = mat.X:double()
-   mat.X = nn.Reshape(5000,3,96,96):forward(mat.X)
+   data_fd = torch.DiskFile(opt.dataDir .. '/binary/train_X.bin', "r", true)
+   data_fd:binary():littleEndianEncoding()
+   mat.X = torch.ByteTensor(5000,3,96,96)
+   data_fd:readByte(mat.X:storage())
+   mat.X = mat.X:float()
 
-   file = io.open(opt.dataDir .. '/binary/train_y.bin')
-   i = 0
-   while true do
-      i = i+1
-      byte = file:read(block)
-      if not byte then break end
-      mat.y[{i}] = tonumber(string.byte(byte))
-   end
+   labels_fd = torch.DiskFile(opt.dataDir .. '/binary/train_y.bin', "r", true)
+   labels_fd:binary():littleEndianEncoding()
+   mat.y = torch.ByteTensor(5000)
+   labels_fd:readByte(mat.y:storage())
+   mat.y = mat.y:float()
 end
 mat.X = mat.X:transpose(3,4)
 
@@ -84,28 +73,17 @@ if opt.dataSource == 'mat' then
    mat.y = mat.y[{{},1}]
 else
    mat = {}
-   block = 1
-   mat.X = torch.Tensor(8000*3*96*96)
-   mat.y = torch.Tensor(8000)
-   file = io.open( opt.dataDir .. '/binary/test_X.bin')
-   i = 0
-   while true do
-      i = i+1
-      byte = file:read(block)
-      if not byte then break end
-      mat.X[{i}] = tonumber(string.byte(byte))
-   end
-   mat.X = mat.X:double()
-   mat.X = nn.Reshape(8000,3,96,96):forward(mat.X)
+   data_fd = torch.DiskFile(opt.dataDir .. '/binary/test_X.bin', "r", true)
+   data_fd:binary():littleEndianEncoding()
+   mat.X = torch.ByteTensor(8000,3,96,96)
+   data_fd:readByte(mat.X:storage())
+   mat.X = mat.X:float()
 
-   file = io.open( opt.dataDir .. '/binary/test_y.bin')
-   i = 0
-   while true do
-      i = i+1
-      byte = file:read(block)
-      if not byte then break end
-      mat.y[{i}] = tonumber(string.byte(byte))
-   end
+   labels_fd = torch.DiskFile(opt.dataDir .. '/binary/test_y.bin', "r", true)
+   labels_fd:binary():littleEndianEncoding()
+   mat.y = torch.ByteTensor(8000)
+   labels_fd:readByte(mat.y:storage())
+   mat.y = mat.y:float()
 end
 
 mat.X = mat.X:transpose(3,4)
@@ -134,23 +112,42 @@ end
 -- per channel mean substraction
 mean = {} -- save for later
 std = {}
+pixelmeans = torch.Tensor(3,96,96)
 for i = 1,3 do
     mean[i] = trainData.data[{ {},i,{},{} }]:mean()
     trainData.data[{ {},i,{},{} }]:add(-mean[i])
     -- normalizing standard deviation as well, can't imagine this hurts...
     std[i] = trainData.data[{ {},i,{},{} }]:std()
     trainData.data[{ {},i,{},{} }]:div(std[i])
+
+    for j = 1,96 do
+       for k = 1,96 do
+          pixmean = trainData.data[{{},i,j,k}]:mean()
+          trainData.data[{{},i,j,k}]:add(-pixmean)
+          pixelmeans[{i,j,k}] = pixmean
+       end
+    end
 end
 
 -- mean subtract and normalize for validation and test sets
 for i = 1,3 do
     valData.data[{ {},i,{},{} }]:add(-mean[i])
     valData.data[{ {},i,{},{} }]:div(std[i])
+    for j = 1,96 do
+       for k = 1,96 do
+          valData.data[{{},i,j,k}]:add(-pixelmeans[{i,j,k}])
+       end
+    end
 end
 
 
 for i = 1,3 do
     testData.data[{ {},i,{},{} }]:add(-mean[i])
     testData.data[{ {},i,{},{} }]:div(std[i])
+    for j = 1,96 do
+       for k = 1,96 do
+          testData.data[{{},i,j,k}]:add(-pixelmeans[{i,j,k}])
+       end
+    end
 end
 
