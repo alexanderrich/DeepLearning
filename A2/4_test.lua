@@ -26,7 +26,7 @@ function test(validation)
    print('==> testing on test set:')
    for t = 1,dataset:size() do
       -- disp progress
-      xlua.progress(t, dataset:size())
+      --xlua.progress(t, dataset:size())
 
       -- get new sample
       local input = dataset.data[t]
