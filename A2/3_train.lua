@@ -102,7 +102,10 @@ function train()
          --local target = trainData.labels[shuffle[i]]
       end
       if opt.type == 'double' then inputs = inputs:double()
-      elseif opt.type == 'cuda' then inputs = inputs:cuda() end
+      elseif opt.type == 'cuda' then
+         inputs = inputs:cuda()
+         targets = targets:cuda()
+      end
 
 
       -- create closure to evaluate f(X) and df/dX
