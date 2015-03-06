@@ -106,6 +106,12 @@ inflate_factor = opt.dataAugmentation
 
 if inflate_factor == 1 then
   print '==> no data augmentation'
+
+  -- Convert all images to HSV ---------------------
+  for i = 1,trainData:size() do
+      image.rgb2hsv(trainData.data[i], trainData.data[i]);
+  end
+
 else 
   print ('==> augment train data set by ' .. inflate_factor)
   
@@ -197,41 +203,48 @@ end
 print ('==> trainData:size() = ' .. trainData:size())
 
 
--- OLD ----------
+-- per channel normalization ---------------------
+if opt.colorNormalize == 'channel' then  
+  print '==> per channel normalization'
+  mean = {}
+  std = {}
+  for i = 2,3 do -- only S and V channel
+      -- use mean and std from training data    
+      mean[i] = trainData.data[{ {},i,{},{} }]:mean()
+      std[i] = trainData.data[{ {},i,{},{} }]:std()
+      
+      trainData.data[{ {},i,{},{} }]:add(-mean[i])
+      trainData.data[{ {},i,{},{} }]:div(std[i])
 
--- -- Convert all images to YUV
--- for i = 1,trainData:size() do
---    image.rgb2yuv(trainData.data[i], trainData.data[i]);
--- end
--- for i = 1,valData:size() do
---    image.rgb2yuv(valData.data[i], valData.data[i]);
--- end
--- for i = 1,testData:size() do
---    image.rgb2yuv(testData.data[i], testData.data[i]);
--- end
+      valData.data[{ {},i,{},{} }]:add(-mean[i])
+      valData.data[{ {},i,{},{} }]:div(std[i])
 
+      testData.data[{ {},i,{},{} }]:add(-mean[i])
+      testData.data[{ {},i,{},{} }]:div(std[i])
+  end
+end
 
+-- per pixel normalization ---------------------
+if opt.colorNormalize == 'pixel' then  
+  print '==> per pixel normalization'
+  pixel_mean = torch.Tensor(3,96,96)
+  pixel_std = torch.Tensor(3,96,96)
+  for i = 2,3 do -- only S and V channel
+      for j = 1,96 do
+          for k = 1,96 do
+            -- use mean and std from training data
+            pixel_mean[{ i,j,k }] = trainData.data[{ {},i,j,k }]:mean()
+            pixel_std[{ i,j,k }] = trainData.data[{ {},i,j,k }]:std()
 
--- -- per channel mean substraction
--- mean = {} -- save for later
--- std = {}
--- for i = 1,3 do
---     mean[i] = trainData.data[{ {},i,{},{} }]:mean()
---     trainData.data[{ {},i,{},{} }]:add(-mean[i])
---     -- normalizing standard deviation as well, can't imagine this hurts...
---     std[i] = trainData.data[{ {},i,{},{} }]:std()
---     trainData.data[{ {},i,{},{} }]:div(std[i])
--- end
+            trainData.data[{ {},i,j,k }]:add(-pixel_mean[{ i,j,k }])
+            trainData.data[{ {},i,j,k }]:div(pixel_std[{ i,j,k }])
 
--- -- mean subtract and normalize for validation and test sets
--- for i = 1,3 do
---     valData.data[{ {},i,{},{} }]:add(-mean[i])
---     valData.data[{ {},i,{},{} }]:div(std[i])
--- end
+            valData.data[{ {},i,j,k }]:add(-pixel_mean[{ i,j,k }])
+            valData.data[{ {},i,j,k }]:div(pixel_std[{ i,j,k }])
 
-
--- for i = 1,3 do
---     testData.data[{ {},i,{},{} }]:add(-mean[i])
---     testData.data[{ {},i,{},{} }]:div(std[i])
--- end
-
+            testData.data[{ {},i,j,k }]:add(-pixel_mean[{ i,j,k }])
+            testData.data[{ {},i,j,k }]:div(pixel_std[{ i,j,k }])
+          end
+      end
+  end
+end
