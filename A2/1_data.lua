@@ -36,7 +36,7 @@ else
    data_fd:readByte(mat.X:storage())
    mat.X = mat.X:float()
 
-   unl_fd = torch.DiskFile(opt.dataDir .. '/binary/unlabled_X.bin', "r", true)
+   unl_fd = torch.DiskFile(opt.dataDir .. '/binary/unlabeled_X.bin', "r", true)
    unl_fd:binary():littleEndianEncoding()
    mat.U = torch.ByteTensor(unlsize,3,96,96)
    unl_fd:readByte(mat.U:storage())
