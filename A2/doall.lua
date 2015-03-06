@@ -50,9 +50,10 @@ dofile '4_test.lua'
 
 print '==> training!'
 i = 0
-while i<100 do
-   train()
+while i<99 do
+   train(false)
    test(true)
    i = i+1
 end
+train(true)
 test(false)
