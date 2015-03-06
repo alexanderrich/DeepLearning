@@ -96,15 +96,15 @@ testData = {
 
 
 
--- Convert all images to YUV
+ -- Convert all images to HSV ---------------------
 for i = 1,trainData:size() do
-   image.rgb2yuv(trainData.data[i], trainData.data[i]);
+image.rgb2hsv(trainData.data[i], trainData.data[i]);
 end
 for i = 1,valData:size() do
-   image.rgb2yuv(valData.data[i], valData.data[i]);
+image.rgb2hsv(valData.data[i], valData.data[i]);
 end
-for i = 1,testData:size() do
-   image.rgb2yuv(testData.data[i], testData.data[i]);
+for i = 1,trainData:size() do
+image.rgb2hsv(testData.data[i], testData.data[i]);
 end
 
 
