@@ -47,7 +47,6 @@ dofile '2_model.lua'
 dofile '3_train.lua'
 dofile '4_test.lua'
 
-
 print '==> training!'
 i = 0
 while i<99 do

@@ -8,6 +8,9 @@ if opt.dataSource == 'mat' then
    mat.X = mat.X:double()
    mat.X = nn.Reshape(3,96,96):forward(mat.X)
    mat.y = mat.y[{{},1}]
+   unl = matio.load(opt.dataDir ..'/matlab/unlabled_small.mat')
+   mat.U = unl.X:double()
+   mat.U = nn.Reshape(3,96,96):forward(mat.U)
 
 else
    mat = {}
@@ -27,30 +30,44 @@ mat.X = mat.X:transpose(3,4)
 
 -- if opt.size == 'full' then
 --    print '==> using regular, full training data'
---    trsize = 4500
+--    lsize = 4500
 --    valsize = 500
 -- elseif opt.size == 'small' then
 --    print '==> using reduced training data, for fast experiments'
---    trsize = 500
+--    lsize = 500
 -- end
-trsize = 4500
+lsize = 4500
 valsize = 500
 testsize = 8000
-
+unlsize = 5000
+trsize = lsize + unlsize
+numcats = 10
 
 -- use a random index to select validation set from training data
-idx = torch.randperm(5000)
-traindataX = torch.Tensor(trsize, 3,96,96)
-traindataY = torch.Tensor(trsize)
-for i=1,trsize do
-   traindataX[{i,{},{},{}}] = mat.X[{idx[i],{},{},{}}]
-   traindataY[i] = mat.y[idx[i]]
+idtrain = torch.randperm(5000)
+trainX = torch.Tensor(lsize, 3,96,96)
+trainY = torch.Tensor(lsize)
+for i=1,lsize do
+   trainX[{i,{},{},{}}] = mat.X[{idtrain[i],{},{},{}}]
+   trainY[i] = mat.y[idtrain[i]]
 end
 valdataX = torch.Tensor(valsize, 3,96,96)
 valdataY = torch.Tensor(valsize)
 for i=1,valsize do
-   valdataX[{i,{},{},{}}] = mat.X[{idx[trsize+i],{},{},{}}]
-   valdataY[i] = mat.y[idx[trsize+i]]
+   valdataX[{i,{},{},{}}] = mat.X[{idtrain[lsize+i],{},{},{}}]
+   valdataY[i] = mat.y[idtrain[lsize+i]]
+end
+trainX = torch.cat(trainX, mat.U, 1)
+traindataX = torch.Tensor(trsize, 3,96,96)
+traindataY = torch.Tensor(trsize, numcats)
+idX = torch.randperm(trsize)
+for i=1,trsize do
+  traindataX[{i,{},{},{}}] = trainX[{idX[i],{},{},{}}]
+  if idX[i] <= lsize then  
+    traindataY[{i, trainY[idX[i]]}] = 1
+  else
+    traindataY[{i,{}}] = torch.ones(numcats) * .1
+  end
 end
 
 trainData = {

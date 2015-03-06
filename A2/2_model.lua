@@ -26,7 +26,7 @@ else
    model:add(nn.LogSoftMax())
 end
 
-criterion = nn.ClassNLLCriterion()
+criterion = nn.DistKLDivCriterion()
 
 print '==> here is the model:'
 print(model)
