@@ -111,6 +111,12 @@ if inflate_factor == 1 then
   for i = 1,trainData:size() do
       image.rgb2hsv(trainData.data[i], trainData.data[i]);
   end
+  for i = 1,valData:size() do
+      image.rgb2hsv(valData.data[i], valData.data[i]);
+  end
+  for i = 1,trainData:size() do
+      image.rgb2hsv(testData.data[i], testData.data[i]);
+  end
 
 else 
   print ('==> augment train data set by ' .. inflate_factor)
@@ -182,6 +188,12 @@ else
   -- Convert all images to HSV ---------------------
   for i = 1,augmentData:size() do
       image.rgb2hsv(augmentData.data[i], augmentData.data[i]);
+  end
+  for i = 1,valData:size() do
+      image.rgb2hsv(valData.data[i], valData.data[i]);
+  end
+  for i = 1,trainData:size() do
+      image.rgb2hsv(testData.data[i], testData.data[i]);
   end
 
   -- apply transformations ---------------------
