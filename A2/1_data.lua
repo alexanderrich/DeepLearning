@@ -3,6 +3,22 @@ if opt.dataSource == 'mat' then
    matio = require 'matio'
 end
 
+-- if opt.size == 'full' then
+--    print '==> using regular, full training data'
+--    lsize = 4500
+--    valsize = 500
+-- elseif opt.size == 'small' then
+--    print '==> using reduced training data, for fast experiments'
+--    lsize = 500
+-- end
+lsize = 4500
+valsize = 500
+Xsize = lsize + valsize
+testsize = 8000
+unlsize = 100000
+trsize = lsize + unlsize
+numcats = 10
+
 if opt.dataSource == 'mat' then
    mat = matio.load(opt.dataDir ..'/matlab/train.mat')
    mat.X = mat.X:double()
@@ -16,32 +32,24 @@ else
    mat = {}
    data_fd = torch.DiskFile(opt.dataDir .. '/binary/train_X.bin', "r", true)
    data_fd:binary():littleEndianEncoding()
-   mat.X = torch.ByteTensor(5000,3,96,96)
+   mat.X = torch.ByteTensor(Xsize,3,96,96)
    data_fd:readByte(mat.X:storage())
    mat.X = mat.X:float()
 
+   unl_fd = torch.DiskFile(opt.dataDir .. '/binary/unlabled_X.bin', "r", true)
+   unl_fd:binary():littleEndianEncoding()
+   mat.U = torch.ByteTensor(unlsize,3,96,96)
+   unl_fd:readByte(mat.U:storage())
+   mat.U = mat.U:float()
+
    labels_fd = torch.DiskFile(opt.dataDir .. '/binary/train_y.bin', "r", true)
    labels_fd:binary():littleEndianEncoding()
-   mat.y = torch.ByteTensor(5000)
+   mat.y = torch.ByteTensor(Xsize)
    labels_fd:readByte(mat.y:storage())
    mat.y = mat.y:float()
 end
 mat.X = mat.X:transpose(3,4)
-
--- if opt.size == 'full' then
---    print '==> using regular, full training data'
---    lsize = 4500
---    valsize = 500
--- elseif opt.size == 'small' then
---    print '==> using reduced training data, for fast experiments'
---    lsize = 500
--- end
-lsize = 4500
-valsize = 500
-testsize = 8000
-unlsize = 5000
-trsize = lsize + unlsize
-numcats = 10
+mat.U = mat.U:transpose(3,4)
 
 -- use a random index to select validation set from training data
 idtrain = torch.randperm(5000)
