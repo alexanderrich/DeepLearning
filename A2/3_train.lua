@@ -96,8 +96,8 @@ function train()
       for i = 1, opt.batchSize do
       --for i = t,math.min(t+opt.batchSize-1,trainData:size()) do
          -- load new sample
-         inputs[i] = trainData.data[shuffle[t+1]]
-         targets[i] = trainData.labels[shuffle[t+1]]
+         inputs[i] = trainData.data[shuffle[t+i]]
+         targets[i] = trainData.labels[shuffle[t+i]]
          --local input = trainData.data[shuffle[i]]
          --local target = trainData.labels[shuffle[i]]
       end
