@@ -86,6 +86,7 @@ function train()
    -- do one epoch
    print('==> doing epoch on training data:')
    print("==> online epoch # " .. epoch .. ' [batchSize = ' .. opt.batchSize .. ']')
+   parameters, gradParameters = model:getParameters()
    for t = 0,trainData:size() - opt.batchSize, opt.batchSize do
       -- disp progress
       --xlua.progress(t, trainData:size())
@@ -106,52 +107,65 @@ function train()
          inputs = inputs:cuda()
          targets = targets:cuda()
       end
+      
 
+
+      local clr
+      gradParameters:zero()
+      local outputs = model:forward(inputs)
+      local f = criterion:forward(outputs, targets)
+      model:backward(inputs, criterion:backward(outputs, targets))
+      clr = opt.learningRate * (0.5 ^ math.floor(epoch / opt.learningRateDecay))
+      parameters:add(-clr, gradParameters)
+      for i = 1, opt.batchSize do
+         confusion:add(outputs[i], targets[i])
+      end
+      
 
       -- create closure to evaluate f(X) and df/dX
-      local feval = function(x)
-                       -- get new parameters
-                       if x ~= parameters then
-                          parameters:copy(x)
-                       end
+      -- local feval = function(x)
+      --                  -- get new parameters
+      --                  if x ~= parameters then
+      --                     parameters:copy(x)
+      --                  end
 
-                       -- reset gradients
-                       gradParameters:zero()
+      --                  -- reset gradients
+      --                  gradParameters:zero()
 
-                       -- f is the average of all criterions
+      --                  -- f is the average of all criterions
 
-                       -- evaluate function for complete mini batch
-                       local output = model:forward(inputs)
-                       local f = criterion:forward(output, targets)
-                       local df_do = criterion:backward(output, targets)
-                       model:backward(inputs, df_do)
-                       -- for i = 1,#inputs do
-                       --    -- estimate f
-                       --    local output = model:forward(inputs[i])
-                       --    local err = criterion:forward(output, targets[i])
-                       --    f = f + err
+      --                  -- evaluate function for complete mini batch
+      --                  local output = model:forward(inputs)
+      --                  local f = criterion:forward(output, targets)
+      --                  local df_do = criterion:backward(output, targets)
+      --                  model:backward(inputs, df_do)
+      --                  -- for i = 1,#inputs do
+      --                  --    -- estimate f
+      --                  --    local output = model:forward(inputs[i])
+      --                  --    local err = criterion:forward(output, targets[i])
+      --                  --    f = f + err
 
-                       --    -- estimate df/dW
-                       --    local df_do = criterion:backward(output, targets[i])
-                       --    model:backward(inputs[i], df_do)
+      --                  --    -- estimate df/dW
+      --                  --    local df_do = criterion:backward(output, targets[i])
+      --                  --    model:backward(inputs[i], df_do)
 
-                       --    -- update confusion
-                       for i = 1, opt.batchSize do
-                          confusion:add(output[i], targets[i])
-                       end
-                       -- end
+      --                  --    -- update confusion
+      --                  for i = 1, opt.batchSize do
+      --                     confusion:add(output[i], targets[i])
+      --                  end
+      --                  -- end
 
 
-                       -- return f and df/dX
-                       return f,gradParameters
-                    end
+      --                  -- return f and df/dX
+      --                  return f,gradParameters
+      --               end
 
-      -- optimize on current mini-batch
-      if optimMethod == optim.asgd then
-         _,_,average = optimMethod(feval, parameters, optimState)
-      else
-         optimMethod(feval, parameters, optimState)
-      end
+      -- -- optimize on current mini-batch
+      -- if optimMethod == optim.asgd then
+      --    _,_,average = optimMethod(feval, parameters, optimState)
+      -- else
+      --    optimMethod(feval, parameters, optimState)
+      -- end
    end
 
    -- time taken

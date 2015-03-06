@@ -18,7 +18,7 @@ cmd:option('-size', 'full', 'how many samples do we load: small | full')
 cmd:option('-save', 'results', 'subdirectory to save/log experiments in')
 cmd:option('-optimization', 'SGD', 'optimization method: SGD | ASGD | CG | LBFGS')
 cmd:option('-learningRate', 1e-3, 'learning rate at t=0')
-cmd:option('-learningRateDecay', 0.002, 'learning rate decay per epoch')
+cmd:option('-learningRateDecay', 20, 'learning rate decay per epoch')
 -- add learning decay
 cmd:option('-batchSize', 128, 'mini-batch size (1 = pure stochastic)')
 cmd:option('-weightDecay', 0, 'weight decay (SGD only)')
