@@ -1,8 +1,9 @@
 #!/bin/bash
 #PBS -l nodes=1:ppn=1
-#PBS -l mem=4GB
+#PBS -l mem=64GB
 #PBS -l walltime=1:00:00
 #PBS -M asr443@nyu.edu
+#PBS -l nodes=1:ppn=1:gpus=1:titan 
  
 module load amber/mvapich2/intel/14.03
  
