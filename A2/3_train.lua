@@ -93,7 +93,7 @@ function train(save)
 
       -- create mini batch
       local inputs = torch.Tensor(128,3,96,96)
-      local targets = torch.Tensor(128)
+      local targets = torch.Tensor(128,10)
       for i = 1, opt.batchSize do
       --for i = t,math.min(t+opt.batchSize-1,trainData:size()) do
          -- load new sample
