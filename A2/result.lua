@@ -40,38 +40,23 @@ end
 
 
 
-modelpredictions = torch.Tensor(3,testData:size())
 -- load trained model
+model = torch.load('/home/asr443/DeepLearning/A2/model.net')
+print(model)
+model:cuda()
+model:evaluate()
 
-for m = 1,5 do
-   model = torch.load('/home/asr443/DeepLearning/A2/model' .. m .. '.net')
-   model:cuda()
-   model:evaluate()
-   -- for each test image, get model prediction and add to predictions
-   for t = 1, testData:size() do
-      local input = testData.data[t]
-      input = input:cuda()
-      local pred = model:forward(input)
-      -- use max function to get index of most-activated output node and print to datastring
-      garbage, argmax = torch.max(pred,1)
-      modelpredictions[{m,t}] = argmax[1]
-   end
-end
+-- for each test image, get model prediction and add to predictions
 datastring = 'Id,Category\n'
-voteCounts = torch.Tensor(10)
 for t = 1, testData:size() do
-   voteCounts:fill(0)
-   
-   for i = 1,5 do
-      voteCounts[modelpredictions[{i,t}]] =  voteCounts[modelpredictions[{i,t}]] + 1
-   end
-
-   garbage, argmax = torch.max(voteCounts, 1)
-   
-
+   local input = testData.data[t]
+   input = input:cuda()
+   local pred = model:forward(input)
+   -- use max function to get index of most-activated output node and print to datastring
+   garbage, argmax = torch.max(pred,1)
    datastring = datastring .. t .. ', ' .. argmax[1] .. '\n'
 end
-   
+
 -- save test results
 file = io.open("predictions.csv", "w")
 io.output(file)
