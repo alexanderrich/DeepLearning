@@ -110,8 +110,8 @@ end
 
 
 -- per channel mean substraction
-mean = {} -- save for later
-std = {}
+mean = torch.Tensor(3) -- save for later
+std = torch.Tensor(3)
 pixelmeans = torch.Tensor(3,96,96)
 for i = 1,3 do
     mean[i] = trainData.data[{ {},i,{},{} }]:mean()
@@ -128,6 +128,10 @@ for i = 1,3 do
        end
     end
 end
+
+torch.save('mean.dat', mean)
+torch.save('std.dat', std)
+torch.save('pixelmeans.dat', pixelmeans)
 
 -- mean subtract and normalize for validation and test sets
 for i = 1,3 do

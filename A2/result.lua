@@ -29,10 +29,13 @@ for i = 1,testData:size() do
    image.rgb2yuv(testData.data[i], testData.data[i]);
 end
 
--- LOAD MEANS/STD'S/PIXEL MEANS 
+-- LOAD MEANS/STD'S/PIXEL MEANS
+mean = torch.load('mean.dat')
+std = torch.load('std.dat')
+pixelmeans = torch.load('pixelmeans.dat')
 
 for i = 1,3 do
-    TESTDATA.DATA[{ {},I,{},{} }]:ADD(-MEAN[I])
+    testData.data[{ {},i,{},{} }]:add(-mean[i])
     testData.data[{ {},i,{},{} }]:div(std[i])
     for j = 1,96 do
        for k = 1,96 do
