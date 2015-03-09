@@ -1,4 +1,4 @@
-require 'csvigo'  -- for saving predictions
+--require 'csvigo'  -- for saving predictions
 
 print '==> defining test procedure'
 
@@ -24,10 +24,11 @@ function test(validation)
 
    -- test over test data
    print('==> testing on test set:')
+   datastring = 'Id,Category\n'
    for t = 1,dataset:size() do
       -- disp progress
       --xlua.progress(t, dataset:size())
-
+      
       -- get new sample
       local input = dataset.data[t]
       if opt.type == 'double' then input = input:double()
@@ -41,6 +42,7 @@ function test(validation)
       predictions.Id[t] = t
       trash_var, predictions.Prediction[t] = torch.max(pred, 1)
       predictions.Prediction[t] = predictions.Prediction[t][1]
+      datastring = datastring .. t .. ', ' .. predictions.Prediction[t] .. '\n'
       
    end
 
@@ -64,7 +66,13 @@ function test(validation)
       -- restore parameters
       parameters:copy(cachedparams)
    end
-   csvigo.save({data=predictions, path = "results/pred.csv"})
+   if not validation then
+      file = io.open("results/pred.csv", "w")
+      io.output(file)
+      io.write(datastring)
+      io.close(file)
+   end
+   --csvigo.save({data=predictions, path = "results/pred.csv"})
    -- next iteration:
    confusion:zero()
 end

@@ -8,7 +8,7 @@ cmd:text()
 cmd:text('STL-10')
 cmd:text()
 cmd:text('Options:')
-cmd:option('-dataSource', 'mat', 'matlab or binary data: mat | bin')
+cmd:option('-dataSource', 'bin', 'matlab or binary data: mat | bin')
 cmd:option('-dataDir', '.', 'directory holding data folders')
 cmd:option('-dataAugmentation', 1, 'augment training data set by this factor (1 = no augmentation)')
 cmd:option('-colorNormalize', 'pixel', 'normalize images per: pixel | channel | none')
@@ -19,12 +19,12 @@ cmd:option('-model', 'convnet', 'type of model to construct: convnet | simple')
 cmd:option('-size', 'full', 'how many samples do we load: small | full')
 cmd:option('-save', 'results', 'subdirectory to save/log experiments in')
 cmd:option('-optimization', 'SGD', 'optimization method: SGD | ASGD | CG | LBFGS')
-cmd:option('-learningRate', 1e-3, 'learning rate at t=0')
-cmd:option('-learningRateDecay', 0.002, 'learning rate decay per epoch')
+cmd:option('-learningRate', 0.01, 'learning rate at t=0')
+cmd:option('-learningRateDecay', 20, 'learning rate decay per epoch')
 -- add learning decay
 cmd:option('-batchSize', 128, 'mini-batch size (1 = pure stochastic)')
 cmd:option('-weightDecay', 0, 'weight decay (SGD only)')
-cmd:option('-momentum', 0, 'momentum (SGD only)')
+cmd:option('-momentum', 0.9, 'momentum (SGD only)')
 cmd:option('-t0', 1, 'start averaging at t0 (ASGD only), in nb of epochs')
 cmd:option('-maxIter', 2, 'maximum nb of iterations for CG and LBFGS')
 cmd:text()
@@ -52,9 +52,10 @@ dofile '4_test.lua'
 
 print '==> training!'
 i = 0
-while i<5 do
-   train()
+while i<99 do
+   train(false)
    test(true)
    i = i+1
 end
+train(true)
 test(false)

@@ -1,62 +1,66 @@
 require 'torch'
 require 'image'
-require 'nn'
-require 'csvigo'
+require 'cunn'
 
 -- load test data and transpose rows/columns to take advantage of
 -- row-major data storage
-loaded = torch.load('test_32x32.t7', 'ascii')
+
+mat = {}
+data_fd = torch.DiskFile('/scratch/courses/DSGA1008/A2/binary/test_X.bin', "r", true)
+data_fd:binary():littleEndianEncoding()
+mat.X = torch.ByteTensor(8000,3,96,96)
+data_fd:readByte(mat.X:storage())
+mat.X = mat.X:float()
+
+mat.X = mat.X:transpose(3,4)
+
 testData = {
-   data = loaded.X:transpose(3,4),
-   labels = loaded.y[1],
-   size = function() return 26032 end
+   data = mat.X,
+   size = function() return 8000 end
 }
-testData.data = testData.data:float()
 
--- convert data from rgb to yuv spectrum
 for i = 1,testData:size() do
-   testData.data[i] = image.rgb2yuv(testData.data[i])
+   image.rgb2yuv(testData.data[i], testData.data[i]);
 end
 
+-- LOAD MEANS/STD'S/PIXEL MEANS
+mean = torch.load('mean.dat')
+std = torch.load('std.dat')
+pixelmeans = torch.load('pixelmeans.dat')
 
--- means and std's of 3 channels from the "extra" size training set,
--- used to normalize test data.
-mean = {110.231, 1.76616, -0.30603}
-std = {49.4773, 9.54416, 10.64495}
 for i = 1,3 do
-   testData.data[{ {},i,{},{} }]:add(-mean[i])
-   testData.data[{ {},i,{},{} }]:div(std[i])
+    testData.data[{ {},i,{},{} }]:add(-mean[i])
+    testData.data[{ {},i,{},{} }]:div(std[i])
+    for j = 1,96 do
+       for k = 1,96 do
+          testData.data[{{},i,j,k}]:add(-pixelmeans[{i,j,k}])
+       end
+    end
 end
 
--- length-13 gaussian kernel used for local normalization of channels:
-neighborhood = image.gaussian1D(13)
-normalization = nn.SpatialContrastiveNormalization(1, neighborhood, 1):float()
-
--- Normalize all channels locally:
-for c = 1,3 do
-   for i = 1,testData:size() do
-      testData.data[{ i,{c},{},{} }] = normalization:forward(testData.data[{ i,{c},{},{} }])
-   end
-end
 
 
 -- load trained model
-model = torch.load('model.net')
+model = torch.load('/home/asr443/DeepLearning/A2/model.net')
 print(model)
+model:cuda()
 model:evaluate()
 
 -- for each test image, get model prediction and add to predictions
-predictions = {Id={},Prediction={}}
+datastring = 'Id,Category\n'
 for t = 1, testData:size() do
    local input = testData.data[t]
-   input = input:double()
+   input = input:cuda()
    local pred = model:forward(input)
-   predictions.Id[t] = t
-   -- use max function to get index of most-activated output node
-   trash_var, predictions.Prediction[t] = torch.max(pred, 1)
-   predictions.Prediction[t] = predictions.Prediction[t][1]
+   -- use max function to get index of most-activated output node and print to datastring
+   garbage, argmax = torch.max(pred,1)
+   datastring = datastring .. t .. ', ' .. argmax[1] .. '\n'
 end
 
 -- save test results
-csvigo.save({data=predictions, path = "predictions.csv"})
+file = io.open("predictions.csv", "w")
+io.output(file)
+io.write(datastring)
+io.close(file)
+
    

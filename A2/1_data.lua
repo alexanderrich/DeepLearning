@@ -202,12 +202,10 @@ end
 
 print ('==> trainData:size() = ' .. trainData:size())
 
-
--- per channel normalization ---------------------
 if opt.colorNormalize == 'channel' then  
   print '==> per channel normalization'
-  mean = {}
-  std = {}
+  mean = torch.Tensor(3)
+  std = torch.Tensor(3)
   for i = 2,3 do -- only S and V channel
       -- use mean and std from training data    
       mean[i] = trainData.data[{ {},i,{},{} }]:mean()
@@ -248,3 +246,10 @@ if opt.colorNormalize == 'pixel' then
       end
   end
 end
+
+
+torch.save('mean.dat', mean)
+torch.save('std.dat', std)
+torch.save('pixelmeans.dat', pixel_mean)
+torch.save('pixelstd.dat', pixel_std)
+
