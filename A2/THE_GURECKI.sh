@@ -12,7 +12,7 @@ cp /home/asr443/DeepLearning/A2/*.lua .
 cp /home/asr443/DeepLearning/A2/mean.dat .
 cp /home/asr443/DeepLearning/A2/std.dat .
 cp /home/asr443/DeepLearning/A2/pixelmeans.dat .
-### COPY PDF HERE!!!###
+cp /home/asr443/DeepLearning/A2/reportA2.pdf .
 
 /scratch/courses/DSGA1008/bin/th result.lua
 
