@@ -79,11 +79,22 @@ Performance ???
 
 \section{Experiments}
 
+These experiments did not help to boost the performance and thus where not included in our final submission.
+
+\subsection{Unlabeled data}
 We attempted to use uniform prescription to train our model using the unlabeled data. In order to 
 do this, we used KL Distance as our loss function so that the target for the unlabeled data could be
 a uniform distribution on all of the categories. The targets for the labeled data were a delta function
 with all probability mass on the true category. We tried using various amounts of unlabeled data from
 500 to all 100000 but this did not seem to improve performance
+
+\subsection{Data augmentation}
+Following Dosovitskiy et al. (2014), we converted all images into HSV color space. We inflated the train data set by a factor of 3 and applied each of the following transformations (thereby flipping a 0.5 coin to decide whether or not to apply the transformation):
+\begin{enumerate}
+	\item A up-left or right-down shift by 2-10 pixels (randomly determined)
+	\item A horizontal flip
+	\item A rotation by 6-10 degrees clockwise or counterclockwise
+\end{enumerate}
 
 \subsubsection*{References}
 
