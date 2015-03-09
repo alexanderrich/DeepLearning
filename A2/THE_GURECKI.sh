@@ -8,8 +8,11 @@ mkdir the_gurecki
 cd the_gurecki
 
 cp /home/asr443/DeepLearning/A2/*.lua .
+
+cp /home/asr443/DeepLearning/A2/mean.dat .
+cp /home/asr443/DeepLearning/A2/std.dat .
+cp /home/asr443/DeepLearning/A2/pixelmeans.dat .
 ### COPY PDF HERE!!!###
 
-/scratch/courses/DSGA1008/A2/bin/th result.lua -dataSource bin -dataDir /scratch/courses/DSGA1008/A2
-
+/scratch/courses/DSGA1008/bin/th result.lua
 
