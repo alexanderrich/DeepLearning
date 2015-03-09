@@ -1,6 +1,6 @@
 #!/bin/bash
-#PBS -l nodes=1:ppn=1
-#PBS -l mem=64GB
+#PBS -l nodes=1:ppn=1:gpus=1:titan
+#PBS -l mem=8GB
 #PBS -l walltime=2:00:00
 
 cd $HOME
