@@ -43,7 +43,7 @@ end
 modelpredictions = torch.Tensor(3,testData:size())
 -- load trained model
 
-for m = 1,3 do
+for m = 1,5 do
    model = torch.load('/home/asr443/DeepLearning/A2/model' .. m .. '.net')
    model:cuda()
    model:evaluate()
@@ -58,16 +58,18 @@ for m = 1,3 do
    end
 end
 datastring = 'Id,Category\n'
+voteCounts = torch.Tensor(10)
 for t = 1, testData:size() do
-   if modelpredictions[{1,t}]==modelpredictions[{2,t}] then
-      pred = modelpredictions[{1,t}]
-   elseif modelpredictions[{1,t}]==modelpredictions[{3,t}] then
-      pred = modelpredictions[{1,t}]
-   else
-      pred = modelpredictions[{2,t}]
+   voteCounts:fill(0)
+   
+   for i = 1,5 do
+      voteCounts[modelpredictions[{i,t}]] =  voteCounts[modelpredictions[{i,t}]] + 1
    end
 
-   datastring = datastring .. t .. ', ' .. pred .. '\n'
+   garbage, argmax = torch.max(voteCounts, 1)
+   
+
+   datastring = datastring .. t .. ', ' .. argmax[1] .. '\n'
 end
    
 -- save test results
