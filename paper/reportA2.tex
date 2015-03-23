@@ -1,0 +1,108 @@
+\documentclass{article} % For LaTeX2e
+\usepackage{nips14submit_e,times}
+\usepackage{hyperref}
+\usepackage{url}
+%\documentstyle[nips14submit_09,times,art10]{article} % For LaTeX 2.09
+
+
+\title{A2 homework submission \\ Team: the gurecki \\ Deep Learning 2015, Spring}
+
+
+\author{
+David Halpern\\
+Department of Psychology\\
+New York University\\
+\texttt{david.halpern@nyu.edu} \\
+\And
+Anselm Rothe\\
+Department of Psychology\\
+New York University\\
+\texttt{ar3918@nyu.edu} \\
+\AND
+Alex Rich\\
+Department of Psychology\\
+New York University\\
+\texttt{asr443@nyu.edu} \\
+}
+
+\newcommand{\fix}{\marginpar{FIX}}
+\newcommand{\new}{\marginpar{NEW}}
+
+\nipsfinalcopy % camera-ready version
+
+\begin{document}
+
+
+\maketitle
+
+\section{Input}
+\section{Architecture}
+\subsection{Stage 1}
+\subsection{Stage 2}
+\subsection{Stage 3}
+\section{Learning Techniques}
+\section{Learning Procedure}
+
+\section{Architecture}
+
+\subsection{Input}
+
+The input is a 3D array with three 2D feature maps of size $32 \times 32$. We preprocessed the training data 
+by normalizing across features so that each feature had a mean of 0 and a standard deviation of 1 and then
+used the same normalization for the test data. The data was also normed per pixel so each pixel across images
+had a mean of 0 and a standard deviation of 1. Each image is padded with zeros of size $2\times2\times2\times2$
+in order to make for better convolutional filter learning.
+
+\subsection{Model}
+The first layer applies 23 $7\times7$ convolutional filters with a stride of 2.  These 
+filters have a ReLU activation function and are fed into a max pooling layer which 
+takes the max of each $3\times3$ region with a step size of $2\times2$. Each filter
+is now $22\times22$. This they are all fed into a linear layer with 50 outputs nodes.
+The outputs are then run through a Tanh activation function and finally put through 
+another linear layer with 10 output nodes, one for each category. The model then
+uses log softmax to convert energies into choices.
+
+\section{Learning Techniques}
+
+We used dropout to train the convolutional layers.
+
+\section{Training Procedure}
+
+We used the to train our model. The model was trained 
+using stochastic gradient descent with a learning rate of .001 ???,
+a batch size of 128 a momentum of .9 and weight decay of ???.  We
+used the typical classNLLcriterion as the loss function. We used a validation set of 500 
+of the original 5000 labeled training examples. The optimization procedure was run for 
+100 epochs over the remaining 4500 training data.
+
+Performance ???
+
+\section{Experiments}
+
+These experiments did not help to boost the performance and thus where not included in our final submission.
+
+\subsection{Unlabeled data}
+We attempted to use uniform prescription to train our model using the unlabeled data. In order to 
+do this, we used KL Distance as our loss function so that the target for the unlabeled data could be
+a uniform distribution on all of the categories. The targets for the labeled data were a delta function
+with all probability mass on the true category. We tried using various amounts of unlabeled data from
+500 to all 100000 but this did not seem to improve performance
+
+\subsection{Data augmentation}
+Following Dosovitskiy et al. (2014), we converted all images into HSV color space. We inflated the train data set by a factor of 3 and applied each of the following transformations (thereby flipping a 0.5 coin to decide whether or not to apply the transformation):
+\begin{enumerate}
+	\item A up-left or right-down shift by 2-10 pixels (randomly determined)
+	\item A horizontal flip
+	\item A rotation by 6-10 degrees clockwise or counterclockwise
+\end{enumerate}
+
+\subsubsection*{References}
+
+\small{
+[1] Dosovitskiy, A., Springenberg, J. T., Riedmiller, M., \& Brox, T. (2014). Discriminative unsupervised feature learning with convolutional neural networks. {\it Advances in Neural Information Processing Systems}, pp. 766-774.
+
+[2] Xiang Zhang (2015). {\it How to Train STL-10 Well}. http://goo.gl/xJGvyH
+}
+
+
+\end{document}
