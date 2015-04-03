@@ -99,7 +99,7 @@ function train_model(model, criterion, data, labels, test_data, test_labels, opt
         for batch=1,opt.nBatches do
             opt.idx = (order[batch] - 1) * opt.minibatchSize + 1
             optim.sgd(feval, parameters, opt)
-            print("epoch: ", epoch, " batch: ", batch)
+            -- print("epoch: ", epoch, " batch: ", batch)
         end
 
         local accuracy = test_model(model, test_data, test_labels, opt)
@@ -113,11 +113,12 @@ function test_model(model, data, labels, opt)
     model:evaluate()
 
     local pred = model:forward(data)
-    local _, argmax = pred:max(2)
-    local err = torch.ne(argmax:double(), labels:double()):sum() / labels:size(1)
+    local diff = torch.add(pred, labels)
+    local diff_abs = torch.abs(diff)
+    local err = torch.mean(diff_abs)
 
-    --local debugger = require('fb.debugger')
-    --debugger.enter()
+    -- local debugger = require('fb.debugger')
+    -- debugger.enter()
 
     return err
 end
@@ -141,8 +142,8 @@ function main()
     opt.nEpochs = 5
     opt.minibatchSize = 128
     opt.nBatches = math.floor(opt.nTrainDocs / opt.minibatchSize)
-    opt.learningRate = 0.1
-    opt.learningRateDecay = 0.001
+    opt.learningRate = 0.001
+    opt.learningRateDecay = 0.0001
     opt.momentum = 0.1
     opt.idx = 1
 
@@ -165,7 +166,7 @@ function main()
 
     -- construct model:
     model = nn.Sequential()
-   
+    
     -- if you decide to just adapt the baseline code for part 2, you'll probably want to make this linear and remove pooling
     model:add(nn.TemporalConvolution(1, 20, 10, 1))
     
@@ -173,13 +174,12 @@ function main()
     -- Replace this temporal max-pooling module with your log-exponential pooling module:
     --------------------------------------------------------------------------------------
     model:add(nn.TemporalMaxPooling(3, 1))
-    
-    model:add(nn.Reshape(20*39, true))
-    model:add(nn.Linear(20*39, 5))
-    model:add(nn.LogSoftMax())
 
-    criterion = nn.ClassNLLCriterion()
-   
+    model:add(nn.Reshape(20*39, true))
+    model:add(nn.Linear(20*39, 1))
+
+    criterion = nn.MSECriterion()
+    
     train_model(model, criterion, training_data, training_labels, test_data, test_labels, opt)
     local results = test_model(model, test_data, test_labels)
     print(results)
