@@ -14,7 +14,7 @@ require("data")
 require("model")
 require("train")
 require("test")
-require("mui")
+-- require("mui")
 
 -- Configurations
 dofile("config.lua")
@@ -120,7 +120,7 @@ function main.new()
    end
 
    -- The visualization
-   main.mui = Mui{width=config.mui.width,scale=config.mui.scale,n=config.mui.n,title="Model Visualization"}
+--    main.mui = Mui{width=config.mui.width,scale=config.mui.scale,n=config.mui.n,title="Model Visualization"}
    main.draw()
    collectgarbage()
 end
@@ -210,7 +210,7 @@ end
 
 -- Draw the visualization
 function main.draw()
-   main.mui:drawSequential(main.model.sequential)
+--   main.mui:drawSequential(main.model.sequential)
 end
 
 -- Save a record
@@ -227,7 +227,7 @@ function main.save()
    main.eps_error = main.eps_error or gnuplot.epsfigure(paths.concat(config.main.save,"figure_error.eps"))
    main.eps_loss = main.eps_loss or gnuplot.epsfigure(paths.concat(config.main.save,"figure_loss.eps"))
    main.show(main.eps_error,main.eps_loss)
-   local ret = pcall(function() main.mui.win:save(paths.concat(config.main.save,"sequential_"..(main.train.epoch-1).."_"..time..".png")) end)
+--   local ret = pcall(function() main.mui.win:save(paths.concat(config.main.save,"sequential_"..(main.train.epoch-1).."_"..time..".png")) end)
    if not ret then print("Warning: saving the model image failed") end
    collectgarbage()
 end

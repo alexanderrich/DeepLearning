@@ -29,6 +29,17 @@ function Data:__init(config)
    self.config = config
    self.data = torch.load(self.file)
 
+   -- modify yelp data file format to match Crepe's needs
+   local index = {}
+   for i = 1, (#self.data.index)[1] do
+      index{i} = self.data.index[i]
+   end
+   self.data.index = index
+   local length
+   for i = 1, (#self.data.length)[1] do
+      length{i} = self.data.length[1]
+   end
+
    if self.prob then
       for i = 1, #self.prob - 1 do
 	 self.prob[i + 1] = self.prob[i] + self.prob[i + 1]
