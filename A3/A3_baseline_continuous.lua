@@ -113,7 +113,7 @@ function test_model(model, data, labels, opt)
     model:evaluate()
 
     local pred = model:forward(data)
-    local diff = torch.add(pred, labels)
+    local diff = torch.add(pred, -labels)
     local diff_abs = torch.abs(diff)
     local err = torch.mean(diff_abs)
 
