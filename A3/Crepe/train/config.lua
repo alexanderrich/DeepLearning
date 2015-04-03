@@ -12,14 +12,14 @@ local alphabet = "abcdefghijklmnopqrstuvwxyz0123456789-,;.!?:'\"/\\|_@#$%^&*~`+-
 
 -- Training data
 config.train_data = {}
-config.train_data.file = paths.concat(paths.cwd(), "../data/train.t7b")
+config.train_data.file = "/scratch/courses/DSGA1008/A3/data/train.t7b"
 config.train_data.alphabet = alphabet
 config.train_data.length = 1014
 config.train_data.batch_size = 128
 
 -- Validation data
 config.val_data = {}
-config.val_data.file =  paths.concat(paths.cwd(), "../data/test.t7b")
+config.val_data.file =  "/scratch/courses/DSGA1008/A3/data/train.t7b"
 config.val_data.alphabet = alphabet
 config.val_data.length = 1014
 config.train_data.batch_size = 128

@@ -32,14 +32,14 @@ function Data:__init(config)
    -- modify yelp data file format to match Crepe's needs
    local index = {}
    for i = 1, (#self.data.index)[1] do
-      index{i} = self.data.index[i]
+      index[i] = torch.Tensor((#self.data.index)[2],1):copy(self.data.index[i])
    end
    self.data.index = index
-   local length
+   local length = {}
    for i = 1, (#self.data.length)[1] do
-      length{i} = self.data.length[1]
+      length[i] = torch.Tensor((#self.data.length)[2],1):copy(self.data.length[1])
    end
-
+   self.data.length = length
    if self.prob then
       for i = 1, #self.prob - 1 do
 	 self.prob[i + 1] = self.prob[i] + self.prob[i + 1]
