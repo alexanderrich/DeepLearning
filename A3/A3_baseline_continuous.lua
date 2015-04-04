@@ -102,8 +102,8 @@ function train_model(model, criterion, data, labels, test_data, test_labels, opt
             -- print("epoch: ", epoch, " batch: ", batch)
         end
 
-        local accuracy = test_model(model, test_data, test_labels, opt)
-        print("epoch ", epoch, " error: ", accuracy)
+        local accuracy, mae  = test_model(model, test_data, test_labels, opt)
+        print("epoch ", epoch, " correct: ", accuracy, " abs error: ", mae)
 
     end
 end
@@ -113,14 +113,18 @@ function test_model(model, data, labels, opt)
     model:evaluate()
 
     local pred = model:forward(data)
+
+    local correct = torch.eq(torch.round(pred), labels)
+    local accuracy = torch.sum(correct) / labels:size(1) 
+
     local diff = torch.add(pred, -labels)
     local diff_abs = torch.abs(diff)
-    local err = torch.mean(diff_abs)
+    local mae = torch.mean(diff_abs)
 
     -- local debugger = require('fb.debugger')
     -- debugger.enter()
 
-    return err
+    return accuracy .. " %", mae
 end
 
 function main()
@@ -139,12 +143,12 @@ function main()
     opt.nTestDocs = 0
     opt.nClasses = 5
     -- SGD parameters - play around with these
-    opt.nEpochs = 5
+    opt.nEpochs = 60
     opt.minibatchSize = 128
     opt.nBatches = math.floor(opt.nTrainDocs / opt.minibatchSize)
-    opt.learningRate = 0.001
-    opt.learningRateDecay = 0.0001
-    opt.momentum = 0.1
+    opt.learningRate = 0.01
+    opt.learningRateDecay = 0.001
+    opt.momentum = 0.01
     opt.idx = 1
 
     print("Loading word vectors...")
@@ -168,9 +172,9 @@ function main()
     model = nn.Sequential()
 
     model:add(nn.Reshape(50, true))
-    model:add(nn.Linear(50, 10))
+    model:add(nn.Linear(50, 5))
     model:add(nn.ReLU())
-    model:add(nn.Linear(10, 1))
+    model:add(nn.Linear(5, 1))
 
     criterion = nn.MSECriterion()
     
