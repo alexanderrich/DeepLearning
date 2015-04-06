@@ -37,7 +37,7 @@ function Data:__init(config)
    self.data.index = index
    local length = {}
    for i = 1, (#self.data.length)[1] do
-      length[i] = torch.Tensor((#self.data.length)[2],1):copy(self.data.length[1])
+      length[i] = torch.Tensor((#self.data.length)[2],1):copy(self.data.length[i])
    end
    self.data.length = length
    if self.prob then
