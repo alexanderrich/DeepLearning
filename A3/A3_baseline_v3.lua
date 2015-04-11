@@ -77,14 +77,13 @@ function TemporalLogExpPooling:updateGradInput(input, gradOutput)
         gradInput = gradInput:fill(0)
         for f = 1, inputFrameSize do -- per feature column
             i = 1
-                vec = input[{{},{f}}]
-                subset = vec:narrow(1,i,kW)
-                gradI = temporalLogExpPoolingGradient(subset)
-                for s = 1, kW do -- per subset element
-                    ii = i+s-1
-                        gradInput[ii][f] = gradInput[ii][f] + gradI[s] -- update gradInput
-                    end
-                end
+            vec = input[{{},{f}}]
+            subset = vec:narrow(1,i,kW)
+            gradI = temporalLogExpPoolingGradient(subset)
+            for s = 1, kW do -- per subset element
+                ii = i+s-1
+                gradInput[ii][f] = gradInput[ii][f] + gradI[s] -- update gradInput
+            end
             i = i + dW
         end
     end
@@ -99,14 +98,12 @@ function TemporalLogExpPooling:updateGradInput(input, gradOutput)
         for b = 1, minibatchSize do -- per batch element
             for f = 1, inputFrameSize do -- per feature column
                 i = 1
-                for j = 1, nOutputFrame do -- per output element
-                    vec = input[b][{{},{f}}]
-                    subset = vec:narrow(1,i,kW)
-                    for s = 1, kW do -- per subset element
-                        ii = i+s-1
-                        if (subset[s] == temporalLogExpPooling(subset)) then
-                            gradInput[b][ii][f] = gradInput[b][ii][f] + gradI[s] -- update gradInput
-                        end
+                vec = input[b][{{},{f}}]
+                subset = vec:narrow(1,i,kW)
+                for s = 1, kW do -- per subset element
+                    ii = i+s-1
+                    if (subset[s] == temporalLogExpPooling(subset)) then
+                         gradInput[b][ii][f] = gradInput[b][ii][f] + gradI[s] -- update gradInput
                     end
                 end
                 i = i + dW
