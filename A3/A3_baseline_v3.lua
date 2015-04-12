@@ -130,8 +130,8 @@ beta = 1
 -- Does the temporal pooling operation
 function temporalLogExpPooling(input)
     local n = input:size()
-    local parens = input:exp():sum():div(n[1])
-    tlep = math.log(parens)/beta
+    local parens = input:exp():sum()
+    tlep = math.log(parens/n[1])/beta
     return tlep
 end
 
