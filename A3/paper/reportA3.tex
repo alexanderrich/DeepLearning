@@ -42,7 +42,7 @@ New York University\\
 In order to leverage the advantages of both character-based and
 word-based models, we trained two models in parallel using completely
 different representations of the underlying data, and then combined
-their predictions to form our final model
+their predictions to form our final model.
 
 \subsection{Model 1}
 
@@ -104,7 +104,7 @@ The optimization procedure was run over the remaining 117K (90\%) training docum
 
 \subsection{Model 1}
 
-Model 1 was trained in 10 epochs using stochastic gradient descent with a batch size of 32, a learning rate of .1, a learning rate decay of 1e-7, a momentum of .9, and no weight decay.
+Model 1 was trained in 10 epochs using stochastic gradient descent with a batch size of 32, a learning rate of .1, a learning rate decay of $1\times 10^{-7}$, a momentum of .9, and no weight decay.
 
 \subsection{Model 2}
 
@@ -115,9 +115,9 @@ weight decay of $1\times 10^{-5}$.
 
 
 \begin{figure}
-	\includegraphics[width=0.8\textwidth]{Training}
+	\includegraphics[\textwidth]{Training}
         \label{fig1}
-        \caption{Individual Model performance for models 1 and 2}
+        \caption{Individual model performance for Models 1 and 2}
 \end{figure}
 
 \section{Individual model performance}
@@ -131,7 +131,7 @@ have been some remaining bugs in this model.)
 
 \section{Model averaging}
 To yield a final prediction, we combined the predictions of the two
-models. Despite the better performance of model 2, we believe the
+models. Despite the better performance of Model 2, we believe the
 combinations of the two kinds of representations may produce more
 robust predictions and reduce generalization error. To combine the
 predictions, we first ran a review through both models to produce the
