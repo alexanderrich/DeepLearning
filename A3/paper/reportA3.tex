@@ -39,9 +39,14 @@ New York University\\
 
 \section{Architecture}
 
+In order to leverage the advantages of both character-based and
+word-based models, we trained two models in parallel using completely
+different representations of the underlying data, and then combined
+their predictions to form our final model
+
 \subsection{Model 1}
 
-We extended the baseline model to use Glove 100 (we couldn't solve memory errors that we got for larger Glove files).
+We extended the baseline model to use Glove 100 [1] (we couldn't solve memory errors that we got for larger Glove files).
 We added a hidden layer with 500 units.
 
 \begin{verbatim}
@@ -58,30 +63,88 @@ We added a hidden layer with 500 units.
 
 \subsection{Model 2}
 
+For model 2, we used the Crepe [2] model of character-based text recognition. This model begins with the raw character representation of the text and transforms it through several layers of temporal convolution and temporal max pooling.
+
+\begin{verbatim}
+  (1): nn.TemporalConvolution
+  (2): nn.Threshold
+  (3): nn.TemporalMaxPooling
+  (4): nn.TemporalConvolution
+  (5): nn.Threshold
+  (6): nn.TemporalMaxPooling
+  (7): nn.TemporalConvolution
+  (8): nn.Threshold
+  (9): nn.TemporalConvolution
+  (10): nn.Threshold
+  (11): nn.TemporalConvolution
+  (12): nn.Threshold
+  (13): nn.TemporalConvolution
+  (14): nn.Threshold
+  (15): nn.TemporalMaxPooling
+  (16): nn.Reshape(8704)
+  (17): nn.Linear(8704 -> 1024)
+  (18): nn.Threshold
+  (19): nn.Dropout
+  (20): nn.Linear(1024 -> 1024)
+  (21): nn.Threshold
+  (22): nn.Dropout
+  (23): nn.Linear(1024 -> 5)
+  (24): nn.LogSoftMax
+\end{verbatim}
 
 \section{Learning Techniques}
 
-Model 1 used dropout (.5). We did not invest in data augmentations. 
+Both models used dropout of 0.5. We did not augment the data. 
 
 \section{Training Procedure}
 
 For both models we used the typical classNLLcriterion as the loss function. We used a validation set of 13K documents (10\%) per class of the original 130K labeled training examples per class.
 The optimization procedure was run over the remaining 117K (90\%) training documents per class.
 
-\begin{figure}
-	\includegraphics[width=0.8\textwidth]{Training}
-\end{figure}
 
 \subsection{Model 1}
 
-The model was trained in 10 epochs using stochastic gradient descent with a batch size of 32, a learning rate of .1, a learning rate decay of 1e-7, a momentum of .9, and no weight decay.
+Model 1 was trained in 10 epochs using stochastic gradient descent with a batch size of 32, a learning rate of .1, a learning rate decay of 1e-7, a momentum of .9, and no weight decay.
 
 \subsection{Model 2}
 
--- Alex
+Model 2 was trained in 7 epochs using stochastic gradient descent with
+a batch size of 128, fixed data width of 1014, a momentum of 0.9, a
+learning rate which started at 0.01 and was halved periodically, and a
+weight decay of $1\times 10^{-5}$.
 
+
+\begin{figure}
+	\includegraphics[width=0.8\textwidth]{Training}
+        \label{fig1}
+        \caption{Individual Model performance for models 1 and 2}
+\end{figure}
+
+\section{Individual model performance}
+Performance for the two models is shown in Figure 1.   Model 2 reached a performance of 65\% accuracy in the training set,
+and 60\% accuracy on the validation set. Model 1 reached a performance
+of only 44\% accuracy on the training set, with, surprisingly, nearly
+identical performance on the validation set. (For this reason, and
+because Model 1 was inexplicably 8gb in size, we believe there may
+have been some remaining bugs in this model.)
+
+
+\section{Model averaging}
+To yield a final prediction, we combined the predictions of the two
+models. Despite the better performance of model 2, we believe the
+combinations of the two kinds of representations may produce more
+robust predictions and reduce generalization error. To combine the
+predictions, we first ran a review through both models to produce the
+log probability of each rating. Then we simply added the log
+probabilities, and predicted the resulting maximum. This method
+penalizes ratings that are considered extremely unlikely by either
+model, yielding results that both models consider plausible.
+
+Unfortunately, we did not have time to systematically test our
+averaged model.
 
 \section{Experiments}
+
 
 These experiments did not help to boost the performance and thus where not included in our final submission.
 
@@ -111,7 +174,9 @@ We attempted to make a model that was similar to the Crepe [2] model but rather 
 \small{
 % [1] Dosovitskiy, A., Springenberg, J. T., Riedmiller, M., \& Brox, T. (2014). Discriminative unsupervised feature learning with convolutional neural networks. {\it Advances in Neural Information Processing Systems}, pp. 766-774.
 
-% [2] Xiang Zhang and (2015). Text Understanding from Scratch. CoRR, abs/1502.01710, .
+[1] Pennington, Jeffrey, Socher, Richard, \& Manning, Christopher D. (2014). Glove: Global vectors for word representation. Proceedings of the Empirical Methods in Natural Language Processing.
+
+[2] Xiang Zhang and (2015). Text Understanding from Scratch. CoRR, abs/1502.01710, .
 }
 
 
