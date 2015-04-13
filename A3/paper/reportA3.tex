@@ -103,13 +103,15 @@ This structure gave better results than a simple unconstrained continuous output
 \end{verbatim}
 but did not reach the performance of the 5-classes output that we eventually used for Model 1.
 
+\subsection{Phoneme understanding from scratch}
+We attempted to make a model that was similar to the Crepe [2] model but rather than using characters as the features, we created a vector that used phonemic translations of the English words as features. The idea was that humans typically learn languages through sound so it is possible that the statistical dependencies of sounds would be more informative for learning than the characters themselves. If the phonemes are a nonlinear transformation of the characters that are not in the space of representations that can be learned with the standard point non-linearities and pooling operations that are often used with convolutional nets, a model using phonemes could perhaps learn better than one using just characters. In order to implement this model, we used a standard pronouncing dictionary used for NLP called CMUDict. The details of this dictionary can be found on its website: http://www.speech.cs.cmu.edu/cgi-bin/cmudict. The dictionary uses 39 standard phonemes, with 15 of these being vowels. Each vowel sound had three possible stress markers resulting in 84 possible phonemic characters. We then added a preprocessing step to translate all words in the yelp reviews that were included in the dictionary into their phonetic representations. For words that were not in the dictionary, we used the standard alphabet of lower-case english letters and punctuation markings, adding an additional 69 characters. Reviews are then represented in the same way as in the original Crepe [2] model but with a sparse vector of length 159 for each phoneme/character. While early performance was promising, we could not figure out how to deal with exploding memory/garbage collection issues in converting the reviews to phonemes and thus we could not really assess this model's performance.
 
 \subsubsection*{References}
 
 \small{
 % [1] Dosovitskiy, A., Springenberg, J. T., Riedmiller, M., \& Brox, T. (2014). Discriminative unsupervised feature learning with convolutional neural networks. {\it Advances in Neural Information Processing Systems}, pp. 766-774.
 
-% [2] Xiang Zhang (2015). {\it How to Train STL-10 Well}. http://goo.gl/xJGvyH
+% [2] Xiang Zhang and (2015). Text Understanding from Scratch. CoRR, abs/1502.01710, .
 }
 
 
