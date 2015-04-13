@@ -145,19 +145,23 @@ function Data:stringToTensor(str, l, input, p)
    local words = str:split(" ")
     local len_str = #str
     local num_words = #words
-    local len_alpha = #alphabet
+    local len_alpha = #self.alphabet
     local word_tensor = torch.zeros(1)
     for n = #words, math.max(num_words - num_words + 1, 1), -1 do
         local s = cmudict[words[n]:upper()]
         if s == nil then
             temp_s = words[n]:lower()
-            s = {temp_s:match((temp_s:gsub(".", "(.)")))}
+            if temp_s:len() > 31 then
+              break
+            else
+              s = {temp_s:match((temp_s:gsub(".", "(.)")))}
+            end
         end
         local l = #s
         local t = torch.zeros(len_alpha, l)
         for i = l, math.max(l - l + 1, 1), -1 do
-            if dict[s[i]] then
-                t[dict[s[i]]][l - i + 1] = 1
+            if self.dict[s[i]] then
+                t[self.dict[s[i]]][l - i + 1] = 1
             end
         end
         if word_tensor:size()[1] == 1 then
