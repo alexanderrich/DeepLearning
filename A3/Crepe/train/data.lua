@@ -11,8 +11,11 @@ local Data = torch.class("Data")
 
 function Data:__init(config)
    -- Alphabet settings
-   self.alphabet = config.alphabet
-   self.dict = config.dict
+   self.alphabet = config.alphabet or "abcdefghijklmnopqrstuvwxyz0123456789-,;.!?:'\"/\\|_@#$%^&*~`+-=<>()[]{}"
+   self.dict = {}
+   for i = 1,#self.alphabet do
+      self.dict[self.alphabet:sub(i,i)] = i
+   end
 
    self.length = config.length or 1014
    self.batch_size = config.batch_size or 128
@@ -142,33 +145,16 @@ function Data:iterator(static, data)
 end
 
 function Data:stringToTensor(str, l, input, p)
-   local words = str:split(" ")
-    local len_str = #str
-    local num_words = #words
-    local len_alpha = #alphabet
-    local word_tensor = torch.zeros(1)
-    for n = #words, math.max(num_words - num_words + 1, 1), -1 do
-        local s = cmudict[words[n]:upper()]
-        if s == nil then
-            temp_s = words[n]:lower()
-            s = {temp_s:match((temp_s:gsub(".", "(.)")))}
-        end
-        local l = #s
-        local t = torch.zeros(len_alpha, l)
-        for i = l, math.max(l - l + 1, 1), -1 do
-            if dict[s[i]] then
-                t[dict[s[i]]][l - i + 1] = 1
-            end
-        end
-        if word_tensor:size()[1] == 1 then
-            temp_tensor = t
-            word_tensor = torch.cat(temp_tensor, torch.zeros(len_alpha))
-        else
-            temp_tensor = torch.cat(word_tensor, t, 2)
-            word_tensor = torch.cat(temp_tensor, torch.zeros(len_alpha))
-        end
-    end
-    return word_tensor
+   local s = str:lower()
+   local l = l or #s
+   local t = input or torch.Tensor(#self.alphabet, l)
+   t:zero()
+   for i = #s, math.max(#s - l + 1, 1), -1 do
+      if self.dict[s:sub(i,i)] then
+	 t[self.dict[s:sub(i,i)]][#s - i + 1] = 1
+      end
+   end
+   return t
 end
 
 return Data

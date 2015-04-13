@@ -8,40 +8,12 @@ require("nn")
 -- The namespace
 config = {}
 
-local file = io.open("cmudict-0.7b.symbols.txt")
-local alphabet = {}
-local dict = {}
-local a2 = "abcdefghijklmnopqrstuvwxyz0123456789-,;.!?:'\"/\\|_@#$%^&*~`+-=<>()[]{}"
-for i = 1,#a2 do
-    table.insert(alphabet, a2:sub(i,i))
-    dict[a2:sub(i,i)] = i
-end
-i = #a2
-for line in file:lines() do
-    table.insert(alphabet, line)
-    dict[line] = i
-    i = i + 1
-end
-
-function tail(list)
-    return { select(3, unpack(list)) }
-end
-
-local file = io.open("cmudict-0.7c.txt")
-cmudict = {}
-for line in file:lines() do
-    local entry = line:split(" ")
-    local word = entry[1]
-    local phonemes = tail(entry)
-    cmudict[word] = phonemes
-end
+local alphabet = "abcdefghijklmnopqrstuvwxyz0123456789-,;.!?:'\"/\\|_@#$%^&*~`+-=<>()[]{}"
 
 -- Training data
 config.train_data = {}
 config.train_data.file = "traindata.t7b"
 config.train_data.alphabet = alphabet
-config.train_data.dict = dict
-config.train_data.cmudict = cmudict
 config.train_data.length = 1014
 config.train_data.batch_size = 128
 
@@ -49,8 +21,6 @@ config.train_data.batch_size = 128
 config.val_data = {}
 config.val_data.file =  "valdata.t7b"
 config.val_data.alphabet = alphabet
-config.val_data.dict = dict
-config.train_data.cmudict = cmudict
 config.val_data.length = 1014
 config.train_data.batch_size = 128
 
