@@ -88,7 +88,7 @@ config.model[20] = {module = "nn.Linear", inputSize = 1024, outputSize = 1024}
 config.model[21] = {module = "nn.Threshold"}
 config.model[22] = {module = "nn.Dropout", p = 0.5}
 -- 1024
-config.model[23] = {module = "nn.Linear", inputSize = 1024, outputSize = 14}
+config.model[23] = {module = "nn.Linear", inputSize = 1024, outputSize = 5}
 config.model[24] = {module = "nn.LogSoftMax"}
 
 -- The loss
