@@ -79,7 +79,7 @@ function TemporalLogExpPooling:updateGradInput(input, gradOutput)
             i = 1
             vec = input[{{},{f}}]
             subset = vec:narrow(1,i,kW)
-            gradI = temporalLogExpPoolingGradient(subset)
+            gradI = gradOutput * temporalLogExpPoolingGradient(subset)
             for s = 1, kW do -- per subset element
                 ii = i+s-1
                 gradInput[ii][f] = gradInput[ii][f] + gradI[s] -- update gradInput
@@ -100,11 +100,10 @@ function TemporalLogExpPooling:updateGradInput(input, gradOutput)
                 i = 1
                 vec = input[b][{{},{f}}]
                 subset = vec:narrow(1,i,kW)
+                gradI = gradOutput * temporalLogExpPoolingGradient(subset)
                 for s = 1, kW do -- per subset element
                     ii = i+s-1
-                    if (subset[s] == temporalLogExpPooling(subset)) then
-                         gradInput[b][ii][f] = gradInput[b][ii][f] + gradI[s] -- update gradInput
-                    end
+                    gradInput[b][ii][f] = gradInput[b][ii][f] + gradI[s] -- update gradInput
                 i = i + dW
                 end
             end
