@@ -7,8 +7,8 @@ require 'data'
 local Model_Average = torch.class("Model_Average")
 
 function Model_Average:__init()
-   self.model1 = torch.load("")
-   self.model2 = torch.load("")
+   self.model1 = torch.load("sequential_35000_1428849303.t7b")
+   self.model2 = torch.load("sequential_35000_1428849303.t7b")
 end
 
 function Model_Average:forward(data)

@@ -1,12 +1,15 @@
 require 'nn'
 require 'torch'
 require 'data'
+require 'model_average'
 
 val_data = Data({file = "valdata.t7b",
                  alphabet = "abcdefghijklmnopqrstuvwxyz0123456789-,;.!?:'\"/\\|_@#$%^&*~`+-=<>()[]{}",
                  length = 1014,
                  batch_size = 128})
-
+current_model = Model_Average()
+current_n = 0
+current_e = 0
 for batch, labels, n in val_data:iterator() do
     current_batch = current_batch or batch:transpose(2,3):contiguous()
     current_labels = current_labels or labels
@@ -21,5 +24,5 @@ for batch, labels, n in val_data:iterator() do
     -- Accumulate the errors and losses
     current_e = current_e*(current_n/(current_n+n)) +  current_err*(n/(current_n+n))
     current_n = current_n + n
-    print("n: " ..current_n.. ", e: " ..string.format("%.2e", current_e) ", err: " ..string.format("%.2e", current_err))
+    print("n: " ..current_n.. ", e: " ..string.format("%.2e", current_e).. ", err: " ..string.format("%.2e", current_err))
 end
