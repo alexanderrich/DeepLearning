@@ -83,8 +83,8 @@ function TemporalLogExpPooling:updateGradInput(input, gradOutput)
             for s = 1, kW do -- per subset element
                 ii = i+s-1
                 gradInput[ii][f] = gradInput[ii][f] + gradI[s] -- update gradInput
-            end
             i = i + dW
+            end
         end
     end
     if (input:nDimension()==3) then -- with batches
@@ -105,8 +105,8 @@ function TemporalLogExpPooling:updateGradInput(input, gradOutput)
                     if (subset[s] == temporalLogExpPooling(subset)) then
                          gradInput[b][ii][f] = gradInput[b][ii][f] + gradI[s] -- update gradInput
                     end
-                end
                 i = i + dW
+                end
             end
         end
     end
